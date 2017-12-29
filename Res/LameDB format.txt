@@ -1,0 +1,89 @@
+Lamedb format
+File format of lamedb explained.
+ Taken from /lib/dvb/db.cpp and Tools/Transponder.py.
+ File is basically a fixed format file where some fields contain multiple values separated by commas of colons. Lines may not exceed 256 characters.
+ It contains two sections.
+
+•Transponders started by a line transponders. Contains transponder frequencies, symbol rates, polarization and satellite position.
+•Services started by a line services. Contains SSID, Card ID for channels on a particular transponder.
+
+Header Line
+The file starts with a line eDVB services /%d/, where %d is format version.
+
+eDVB services /4/
+
+Transponders section
+Section starts with a line transponders.
+ Followed by a DVB line and transponder data line tuples. The DVB data line starts at col 0, the transponder data line immediatly follows and starts with a <TAB>.
+ Lines starting at col0 contains three fields encoded in hexadecimal:
+•DVB namespace
+•Transport stream id
+•Original network id
+
+ Lines starting with a <TAB> character and contain DVB transponder data such as frequency and symbol rate. Three types of DVB transponders can be encoded here:
+
+•Satellite DVB
+•Terestrial DVB
+•Cable DVB
+
+Satellite lines start with <TAB>s like:  s 10773250:22000000:0:2:192:2:0:1:2:0:2 fields for version 3 and 4. All fields are separated by colons, values in decimal.
+
+
+•Frequency in Hertz.
+•Symbol rate in bits per second.
+•Polarization: 0=Horizontal, 1=Vertical, 2=Circular Left, 3=Circular right.
+•Forward Error Control (FEC): 0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10.
+•Orbital Position: in degrees East: 130 is 13.0E, 192 is 19.2E. Negative values are West -123 is 12.3West. 
+•Inversion: 0=Auto, 1=On, 2=Off
+•Flags (Only in version 4): Field is absent in version 3.
+•System: 0=DVB-S 1=DVB-S2.
+•Modulation: 0=Auto, 1=QPSK, 2=QAM16, 3=8PSK.
+•Rolloff (Only used in DVB-S2): 0=0.35, 1=0.25, 3=0.20
+•Pilot (Only used in DVB-S2): 0=Auto, 1=Off, 1=On.
+
+
+Terrestrial lines start with <TAB>t:
+
+
+•frequency in Hertz.
+•Bandwidth: 0=Auto, 1=8Mhz, 2=7Mhz, 3=6Mhz.
+•Code rate High Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8.
+•Code rate Low Pass FEC: 0=Auto, 1=1/2, 2=2/3, 3=3/4, 4=5/6, 5=7/8.
+•Modulation: 0=Auto, 1=QPSK, 2=QAM16, 3=QAM64.
+•Transmission mode: 0=Auto, 1=2k, 3=8k
+•Guard Interval: 0=Auto, 1=1/32, 2=1/16, 3=1/8, 4=1/4
+•Hierarchy: 0=Auto, 1=None, 2=1, 3=2, 4=4
+•Inversion: 0=Auto, 1=On, 2=Off.
+•Flags
+
+
+Cable lines start with <TAB>c:
+
+•Frequency in Hertz.
+•Symbol rate.
+•Inversion: 0=Auto, 1=On, 2=Off.
+•Modulation: 0=Auto, 1=QAM16, 2=QAM32, 3=QAM64, 4=QAM128, 5=QAM256.
+•Forward Error Control innert (FEC_inner): 0=None, 1=Auto, 2=1/2, 3=2/3, 4=3/4, 5=5/6, 6=7/8, 7=8/9.
+•Flags
+
+services section
+
+The section starts with the word services on a line by itself.
+ Followed by a three line tuple: DVB stream data, Channel name, Provider data line.
+ The DVB stream data line contains six fields:
+
+•Service id (SSID value from stream) in Hex
+•DVB namespace in Hex.
+•Transport stream id in Hex
+•Original network id in Hex
+•Service type in Decimal: 1=TV, 2=Radio
+•Service number in Decimal.
+
+
+The Channel name is on a line by itself in some character encoding (to be investigated)
+ The last line contains Provider Service data. Variable number of fields, separated by commas. Fields formed like <tag>:value. For example p:Sky Digital,c:000202,c:010282,c:020242,c:030202,c:0500 01,C:0963,C:0961,C:0960.
+
+•Provider name field. Field tag p: Name of provider.
+•Cached data. Field tag c: followed by two decimal digits and four hexadecimal digits. For example c:010282 is composed of 01 decimal cache id, 0282 hexadecimal value to cache.
+•Card ID (CIAD). Field tag C: follwed by four hexadecimal digits: Card ID. For example C:0100.
+•Flag data: Field tag f: followed by hexadecimal digits.
