@@ -1,0 +1,39 @@
+++++++++++++++++++++++++++++++
++++ SERVICE REFERENCE CODE +++
+++++++++++++++++++++++++++++++
+
+         1 2 3   4   5  6    7   8 9 10
+---------------------------------------
+#SERVICE 1:0:1:445C:453:1:C00000:0:0:0:
+---------------------------------------
+    order → explanation
+---------------------------------------
+    first → determination of source or stream player (1 = DVB-S/C/T/IP - eDVBDemux decoder; 4097 = GStreamer - online streaming media player; 5001,5002,5003 = additional players such as ffmpeg + exteplayer3)
+   second → special purpose, usually there is always 0 ... if it's an information marker (row with a text string) in the channel list, then the second position is value 64, and the third position mean ordinal number of marker, for example: 1:64:ordinal_number:.....the remainder of the ServRefCode is just zero.....
+    third → service type (1 = TV; 2 = RADIO) or other specified quality of the broadcast TV stream (16 = SD; 19 = MPEG4 [HD]; 1F = UHD;
+
+- some examples:
+     1:0:1:...     DVB-stream:0:TV
+     1:0:2:...     DVB-stream:0:RADIO
+  4097:0:1:...     internet-stream:0:TV
+  4097:0:2:...     internet-stream:0:RADIO
+
+   fourth → Service ID (445C => "SAT.1") - the identification code of a specific channel (service)
+    fifth → Transponder ID (453) - transponder number on a particular satellite
+    sixth → Network ID (1) - I did not find out what it means
+  seventh → satellite identification - the first two or three digits of this value indicate the position of the satellite in the universe (eg: C0 hex => 192 dec => 19.2 E) and together as a whole this is so-called the 'Name Space' (could it mean something like "the name of a space in the universe" ?)
+
+eight to ten → 3 zeros at the end of the service reference code are currently unused by Enigma, perhaps used earlier or later. even now, as far as I know, they are using for experimental purposes (for testing) only
+---------------------------------------
+
+---------------------------------------
+Another example of a service reference code from a particular Skylink provider ... on a specific satellite "Astra 23.5E" ... for a concrete channel Markiza:
+
+#SERVICE 1:0:19:13B4:C95:3:EB0000:0:0:0:
+
+- if we neglect the first three data, the other data means ...
+- 13B4 hex / 5044 dec means ServiceID - the unique number of a particular TV channel on a transponder or on a satellite (on other transponders or satellites, the same Markiza can be assigned a totally different number)
+- C95 hex / 3221 dec means TransponderID
+- value 3 represents NetworkID (I do not know what does it mean)
+- and finally the value of EB0000 hex represents the position of the satellite in the universe (EB hex => 235 dec => 23.5 E position)
+--------------------

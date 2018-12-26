@@ -56,7 +56,7 @@ class CBouquets():
                    continue
                     
                 # Co oznacza 1:0:1 i dlaczego dla niektorych jest 19 ? Moze pilot...
-                Service = re.match( '^#SERVICE 1:0:\d+:([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
+                Service = re.match( '^#SERVICE 1:0:[\d\w]+:([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
                 if Service:
                     cService = CService()
                     cService.ServiceID = int( Service.group(1) , 16)

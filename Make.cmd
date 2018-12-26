@@ -1,2 +1,2 @@
-python E2DvbViewer.py -r Channels -l "t:\Stuff\DVB\Enigma2\Listy\Enigma2\E2_HD_settings_HB13E_HSWG_09112017 edit by bzyk83\lamedb" -o d:\Temp\DVBViewer.ini -t t:\Stuff\DVB\PC\TransEdit\13E_Channels.ini -t t:\Stuff\DVB\PC\TransEdit\19.2E_Channels.ini >> d:\Temp\Convert.log
+python E2DvbViewer.py -r Channels -l "d:\Source\SvnDocuments\Settings\ChannelLists\Enigma2\lamedb" -o d:\Temp\DVBViewer.ini -t t:\Stuff\DVB\PC\TransEdit\13E_Channels.ini -t t:\Stuff\DVB\PC\TransEdit\19.2E_Channels.ini >> d:\Temp\Convert.log
 pause
