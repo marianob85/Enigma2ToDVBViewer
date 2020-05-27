@@ -180,7 +180,7 @@ class CEnigma2Struct():
         self.Open( Path )
         
     def Open(self, Path ):
-        self._file = open( Path, 'r')
+        self._file = open( Path, encoding='utf-8', mode="r")
         self._read()
            
     def _read(self):
@@ -237,7 +237,7 @@ class CEnigma2Struct():
                     break
             
             if cService.Transponder == None:
-                print "Can't find tranponder" 
+                print ("Can't find tranponder")
             self.Services.append( cService )
         return   
     
@@ -288,14 +288,14 @@ if __name__ == '__main__':
     for i in options.TransponderListFiles:
         cDvbViewerIniCol.ReadFile( i )
     
-    file = open( options.OutputFileList, 'w')
+    file = open( options.OutputFileList,  encoding='utf-8', mode="w")
     Channel = 0
     
     for cBouquet in cBouquetsList:
         for cBouquetService in cBouquet.Services:
             cService = cEnigma2Struct.FindService(cBouquetService.ServiceID, cBouquetService.TransportStreamID, cBouquetService.OriginalNetworkID, cBouquetService.DVBNameSpace)
             if cService == None:
-                print "Can't find serviceID: " + cBouquetService.ServiceID
+                print ("Can't find serviceID: " + cBouquetService.ServiceID)
                 exit( 0 )
             
             cDvbViewerIni = cDvbViewerIniCol.Find( cService.Transponder.Data.Frequency / 1000,
@@ -306,7 +306,7 @@ if __name__ == '__main__':
                                    cService.Transponder.Data.OrbitalPosition )
             
             if cDvbViewerIni == None:
-                print "Can't find: {0}".format( cService.ChannelName )             
+                print ( "Can't find: {0}".format( cService.ChannelName ).encode('utf-8') )
                 continue
             
             cDvbViewerIni.ChannelS[ "Root" ] = options.RootName
@@ -314,7 +314,7 @@ if __name__ == '__main__':
             cDvbViewerIni.ChannelS[ "Name" ] = cService.ChannelName
             
             file.write( '[Channel{0}]\n'.format( Channel ) )
-            for k,v in cDvbViewerIni.ChannelS.iteritems():  
+            for k,v in cDvbViewerIni.ChannelS.items():  
                 file.write( '{0}={1}'.format(k,v).strip() )
                 file.write( '\n' )
             file.write( "\n")    
