@@ -1,3 +1,5 @@
+https://github.com/Evoxx/lamedb-conversion/blob/master/lamedb2vdr.sh
+
 Lamedb format
 File format of lamedb explained.
  Taken from /lib/dvb/db.cpp and Tools/Transponder.py.

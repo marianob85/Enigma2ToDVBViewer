@@ -10,19 +10,19 @@ import sys
 import fileinput
 import codecs
 
-class CService():
+class Service():
     def __init__(self):
         self.ServiceID = None
         self.TransportStreamID = None
         self.OriginalNetworkID = None
         self.DVBNameSpace = None
 
-class  CBouquet():
+class Bouquet():
     def __init__(self):
         self.Name = None
         self.Services = []
 
-class CBouquets():   
+class Bouquets():
     def Read(self, FileName ):
         
         cBouquets = []
@@ -45,26 +45,26 @@ class CBouquets():
         
     def ReadBouquet(self, FilePath):
         
-        cBouquet = CBouquet()
+        cBouquet = Bouquet()
         
         with codecs.open( FilePath, 'r', encoding='utf-8', errors='ignore' ) as f:       
             for Line in f:
                 Name = re.match( '^#NAME (.+)$', Line )
                 if Name:
-                   cBouquet.Name = Name.group( 1 ).encode('utf-8', 'ignore').strip()
+                   cBouquet.Name = Name.group( 1 ).strip()
 
                    continue
                     
                 # Co oznacza 1:0:1 i dlaczego dla niektorych jest 19 ? Moze pilot...
-                Service = re.match( '^#SERVICE 1:0:[\d\w]+:([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
-                if Service:
-                    cService = CService()
-                    cService.ServiceID = int( Service.group(1) , 16)
-                    cService.TransportStreamID = int( Service.group(2) , 16)
-                    cService.OriginalNetworkID = int( Service.group(3) , 16)
-                    cService.DVBNameSpace = int( Service.group(4) , 16)
+                serviceMath = re.match( '^#SERVICE 1:0:[\d\w]+:([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
+                if serviceMath:
+                    service = Service()
+                    service.ServiceID = int( serviceMath.group(1) , 16)
+                    service.TransportStreamID = int( serviceMath.group(2) , 16)
+                    service.OriginalNetworkID = int( serviceMath.group(3) , 16)
+                    service.DVBNameSpace = int( serviceMath.group(4) , 16)
                     
-                    cBouquet.Services.append(cService)
+                    cBouquet.Services.append(service)
         return cBouquet
     
     

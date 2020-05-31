@@ -1,0 +1,13 @@
+Several properties are coded bitwise in the SatModulation value. Starting with Bit 0 (the least significant resp. rightmost one):
+
+ 
+
+Bit 0..1: Modulation (00 = Auto, 01 = QPSK, 10 = 8PSK, 11 = 16QAM)
+
+Bit 2: Modulation system (0 = DVB-S, 1 = DVB-S2)
+
+Bit 3..4: Roll-Off (00 = 0.35, 01 = 0.25, 10 = 0.20, 11 = None)
+
+Bit 5..6: Spectral Inversion (00 = not set, 01 = auto, 10 = normal, 11 = inverted)
+
+Bit 7: Pilot Symbols (0 = off, 1 = on)
