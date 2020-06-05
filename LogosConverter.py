@@ -73,7 +73,6 @@ if __name__ == '__main__':
             logos = [x for x in inputDirectoryLogoList if logoToFind.casefold() in x.name.casefold() ]
             if not logos:
                 print("Can't find logo: {}: {} ".format(service.ChannelName, logoToFind))
-                print(service)
                 continue
             for file in logos:
                 newName = file.name.replace(logoToFind, service.ChannelName ).replace(" ","")
