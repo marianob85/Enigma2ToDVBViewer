@@ -6,14 +6,14 @@ class TransponderS():
         self.Frequency = 0x0  # In Hertz
         self.SymbolRateBPS = 0x0  # Symbol rate in bits per second.
         self.Polarization = 0x0  # 0=Horizontal, 1=Vertical, 2=Circular Left, 3=Circular right.
-        self.FEC = ''  # 0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10.
+        self.FEC = 0x0  # FEC_Auto=0, FEC_1_2=1, FEC_2_3=2, FEC_3_4=3, FEC_5_6=4, FEC_7_8=5, FEC_8_9=6, FEC_3_5=7, FEC_4_5=8, FEC_9_10=9, FEC_6_7=10, FEC_None=15
         self.OrbitalPosition = 0x0  # in degrees East: 130 is 13.0E, 192 is 19.2E. Negative values are West -123 is 12.3West.
-        self.Inversion = 0x0  # 0=Auto, 1=On, 2=Off
+        self.Inversion = 0x0  # Inversion_Off, Inversion_On, Inversion_Unknown
         self.Flags = 0x0  # Flags (Only in version 4): Field is absent in version 3.
-        self.System = 0x0  # 0=DVB-S 1=DVB-S2.
-        self.Modulation = 0x0  # 0=Auto, 1=QPSK, 2=QAM16, 3=8PSK
-        self.Rolloff = 0x0  # (Only used in DVB-S2): 0=0.35, 1=0.25, 2=0.20
-        self.Pilot = 0x0  # (Only used in DVB-S2): 0=Auto, 1=Off, 1=On.
+        self.System = 0x0  # System_DVB_S, System_DVB_S2
+        self.Modulation = 0x0  # 0 - Modulation_Auto, 1 - Modulation_QPSK, 2 - Modulation_8PSK, 3 - Modulation_QAM16, 4 - Modulation_16APSK, 5 - Modulation_32APSK
+        self.Rolloff = 0x0  # (Only used in DVB-S2): RollOff_alpha_0_35, RollOff_alpha_0_25, RollOff_alpha_0_20, RollOff_auto
+        self.Pilot = 0x0  # (Only used in DVB-S2): Pilot_Off, Pilot_On, Pilot_Unknown
 
     def ReadData(self, Line):
         DataLine = Line.split(":")

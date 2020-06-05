@@ -1,2 +1,2 @@
-"c:\Program Files\Python38\python.exe" E2DvbViewer.py -r Channels -l "d:\Source\SvnDocuments\Settings\ChannelLists\Enigma2\lamedb" -o d:\Temp\DVBViewer.ini -t t:\Stuff\DVB\PC\TransEdit\13E_Channels.ini -t t:\Stuff\DVB\PC\TransEdit\19.2E_Channels.ini >> d:\Temp\Convert.log
+"c:\Program Files\Python38\python.exe" E2DvbViewer.py -r Channels -l "d:\Source\SvnDocuments\Settings\ChannelLists\Enigma2\lamedb" -o d:\Temp\DVBViewer.ini >> d:\Temp\Convert.log
 pause

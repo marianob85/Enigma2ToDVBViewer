@@ -1,5 +1,9 @@
 import lameDB
 
+LOF_SW = 11700
+LOF_1 = 9750
+LOF_2 = 10600
+
 class Channel:
     def __init__(self, lamedbService: lameDB.Service):
         self.TunerType = 1       # 1 - Sat, 2 - Terrestrial
@@ -30,24 +34,34 @@ class Channel:
                                                   lamedbService.Transponder.Data.System,
                                                   lamedbService.Transponder.Data.Rolloff,
                                                   lamedbService.Transponder.Data.Pilot)   # Modulation & Rolloff & Pilot & System
+        self.LNB = self.__lnb( self.__frequency(lamedbService.Transponder.Data.Frequency))
+        self.LNBSelection = self.__lnb_selection(self.__frequency(lamedbService.Transponder.Data.Frequency))
         #self.SubStreamID = None
 
+    def __lnb(self, frequency ):
+        if frequency < LOF_SW:
+            return LOF_1
+        else:
+            return LOF_2
+
+    def __lnb_selection(self, frequency):
+        if frequency < LOF_SW:
+            return 0
+        else:
+            return 1
+
     def __fec(self, fec):
-        # Enigma2
-        # 0=None , 1=Auto, 2=1/2, 3=2/3, 4=3/4 5=5/6, 6=7/8, 7=3/5, 8=4/5, 9=8/9, 10=9/10.
         EnigmaMap = {}
         EnigmaMap["0"] = "-1"
-        EnigmaMap["1"] = "-1"
-        EnigmaMap["2"] = "0"
-        EnigmaMap["3"] = "1"
-        EnigmaMap["4"] = "2"
-        EnigmaMap["5"] = "3"
-        EnigmaMap["6"] = "4"
-        EnigmaMap["7"] = "6"
-        EnigmaMap["8"] = "7"
-        EnigmaMap["9"] = "5"
-        EnigmaMap["10"] = "8"
-
+        EnigmaMap["1"] = "0"
+        EnigmaMap["2"] = "1"
+        EnigmaMap["3"] = "2"
+        EnigmaMap["4"] = "3"
+        EnigmaMap["5"] = "4"
+        EnigmaMap["6"] = "6"
+        EnigmaMap["7"] = "7"
+        EnigmaMap["8"] = "5"
+        EnigmaMap["9"] = "8"
         return EnigmaMap[fec]
 
     def __frequency(self, frequency):
@@ -64,19 +78,6 @@ class Channel:
 
     def __symbolrate(self, symbolrate):
         return symbolrate // 1000
-
-    def __modulation(self, modulation):
-        if modulation == 0:
-            return 0
-        elif modulation == 1:
-            return 0b1
-        elif  modulation == 2:
-            return 0b11
-        elif modulation == 3:
-            return 0b10
-
-        print("Modulation unknown: {0}".format(modulation))
-        return None
 
     def __rolloff(self, rolloff):
         if rolloff is None:
@@ -96,7 +97,7 @@ class Channel:
         return None
 
     def __satmodulation(self, modulation, system, rolloff, pilot):
-        satModulation = self.__modulation(modulation)
+        satModulation = modulation         # DVBViewer: 00 = Auto, 01 = QPSK, 10 = 8PSK, 11 = 16QAM
         satModulation |= ( system & 1 ) << 2
         satModulation |= self.__rolloff(rolloff) << 3
         satModulation |= self.__pilot(pilot) << 7
@@ -119,11 +120,16 @@ class DvbViewer():
     def save(self, filename):
         file = open( filename,  encoding='utf-8', mode="w")
 
+        keyMap = {"LNBSelection":"LNB-Selection"}
+
         channelCount = 0
         for channel in self.Channels:
             file.write('[Channel{0}]\n'.format(channelCount))
             for v,k in channel.__dict__.items():
-                file.write('{0}={1}\n'.format(v,k))
+                if v in keyMap:
+                    file.write('{0}={1}\n'.format(keyMap[v], k))
+                else:
+                    file.write('{0}={1}\n'.format(v,k))
             file.write('\n')
             channelCount = channelCount + 1
         file.close()
