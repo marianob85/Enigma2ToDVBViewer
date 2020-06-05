@@ -12,6 +12,7 @@ import codecs
 
 class Service():
     def __init__(self):
+        self.ServiceType = None
         self.ServiceID = None
         self.TransportStreamID = None
         self.OriginalNetworkID = None
@@ -56,13 +57,14 @@ class Bouquets():
                    continue
                     
                 # Co oznacza 1:0:1 i dlaczego dla niektorych jest 19 ? Moze pilot...
-                serviceMath = re.match( '^#SERVICE 1:0:[\d\w]+:([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
+                serviceMath = re.match( '^#SERVICE 1:0:([\d\w]+):([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
                 if serviceMath:
                     service = Service()
-                    service.ServiceID = int( serviceMath.group(1) , 16)
-                    service.TransportStreamID = int( serviceMath.group(2) , 16)
-                    service.OriginalNetworkID = int( serviceMath.group(3) , 16)
-                    service.DVBNameSpace = int( serviceMath.group(4) , 16)
+                    service.ServiceType = int(serviceMath.group(1) , 16)
+                    service.ServiceID = int( serviceMath.group(2) , 16)
+                    service.TransportStreamID = int( serviceMath.group(3) , 16)
+                    service.OriginalNetworkID = int( serviceMath.group(4) , 16)
+                    service.DVBNameSpace = int( serviceMath.group(5) , 16)
                     
                     cBouquet.Services.append(service)
         return cBouquet
