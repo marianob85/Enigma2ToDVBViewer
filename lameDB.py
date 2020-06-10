@@ -36,9 +36,6 @@ class TransponderS():
         else:
             raise
 
-
-
-
 class Transponder():
     def __init__(self):
         self.DVBNameSpace = 0x0
@@ -100,6 +97,13 @@ class Enigma2Struct():
         self.Transponders = []
         self.Services = []
         self.Open(Path)
+
+    def getOrbitals(self):
+        data = set()
+        for transponder in self.Transponders:
+            data.add(transponder.Data.OrbitalPosition)
+
+        return list(data)
 
     def Open(self, Path):
         self._file = open(Path, encoding='utf-8', mode="r")

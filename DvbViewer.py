@@ -1,44 +1,50 @@
 import lameDB
+import Kingofsat
 
 LOF_SW = 11700
 LOF_1 = 9750
 LOF_2 = 10600
 
+
 class Channel:
-    def __init__(self, lamedbService: lameDB.Service):
-        self.TunerType = 1       # 1 - Sat, 2 - Terrestrial
-        self.Root = None            # List tree name
-        self.Category = None        # Category
-        self.Name = lamedbService.ChannelName            # Channel name
-        self.OrbitalPos = lamedbService.Transponder.Data.OrbitalPosition      # OrbitalPosition
-        self.NetworkID = lamedbService.Transponder.OriginalNetworkID       # OriginalNetworkID
-        self.StreamID = lamedbService.Transponder.TransportStreamID        # TransportStreamID
-        self.SID = lamedbService.ServiceID             # Service ID
-        #self.PMTPID = None
-        #self.VPID = None
-        #self.APID = None
-        #self.PCRPID = None
-        #self.AC3 = None
-        #self.Language = None
-        #self.Volume = None
-        #self.EPGFlag = None
-        #self.TelePID = None
-        #self.AudioChannel = None
-        self.Encrypted = 25     # ??
-        #self.Group = None
+    def __init__(self, lamedbService: lameDB.Service, kingofsat: Kingofsat.Service, kofAudioID):
+        self.TunerType = 1  # 1 - Sat, 2 - Terrestrial
+        self.Root = None  # List tree name
+        self.Category = None  # Category
+        self.Name = lamedbService.ChannelName  # Channel name
+        self.OrbitalPos = lamedbService.Transponder.Data.OrbitalPosition  # OrbitalPosition
+        self.NetworkID = lamedbService.Transponder.OriginalNetworkID  # OriginalNetworkID
+        self.StreamID = lamedbService.Transponder.TransportStreamID  # TransportStreamID
+        self.SID = lamedbService.ServiceID  # Service ID
+        self.Encrypted = 25  # ??
         self.FEC = self.__fec(lamedbService.Transponder.Data.FEC)
-        self.Frequency = self.__frequency(lamedbService.Transponder.Data.Frequency)       # Frequency
-        self.Polarity = self.__polarity(lamedbService.Transponder.Data.Polarization)        # Polarization
-        self.Symbolrate = self.__symbolrate(lamedbService.Transponder.Data.SymbolRateBPS)      # SymbolRateBPS
+        self.Frequency = self.__frequency(lamedbService.Transponder.Data.Frequency)  # Frequency
+        self.Polarity = self.__polarity(lamedbService.Transponder.Data.Polarization)  # Polarization
+        self.Symbolrate = self.__symbolrate(lamedbService.Transponder.Data.SymbolRateBPS)  # SymbolRateBPS
         self.SatModulation = self.__satmodulation(lamedbService.Transponder.Data.Modulation,
                                                   lamedbService.Transponder.Data.System,
                                                   lamedbService.Transponder.Data.Rolloff,
-                                                  lamedbService.Transponder.Data.Pilot)   # Modulation & Rolloff & Pilot & System
-        self.LNB = self.__lnb( self.__frequency(lamedbService.Transponder.Data.Frequency))
+                                                  lamedbService.Transponder.Data.Pilot)  # Modulation & Rolloff & Pilot & System
+        self.LNB = self.__lnb(self.__frequency(lamedbService.Transponder.Data.Frequency))
         self.LNBSelection = self.__lnb_selection(self.__frequency(lamedbService.Transponder.Data.Frequency))
-        #self.SubStreamID = None
+        self.SubStreamID = None
+        self.AC3 = None
+        self.Group = None
+        self.Volume = None
+        self.EPGFlag = None
+        self.AudioChannel = None
+        if kingofsat:
+            self.PMTPID = kingofsat.PMTPID
+            self.VPID = kingofsat.VPID
+            self.APID = kofAudioID[0]
+            self.PCRPID = kingofsat.PCR
+            self.Language = kofAudioID[1] if len(kofAudioID[1]) > 0 else str(kofAudioID[0])
+            self.TelePID = kingofsat.TeletextPID
+            if kofAudioID != kingofsat.APIDS[0]:
+                self.Name = "{} ({})".format(self.Name, self.Language)
+                self.Encrypted = self.Encrypted | 0B10000000
 
-    def __lnb(self, frequency ):
+    def __lnb(self, frequency):
         if frequency < LOF_SW:
             return LOF_1
         else:
@@ -93,12 +99,12 @@ class Channel:
         elif pilot == 2:
             return 1
 
-        print("Pilot unknown: {0}".format( pilot ))
+        print("Pilot unknown: {0}".format(pilot))
         return None
 
     def __satmodulation(self, modulation, system, rolloff, pilot):
-        satModulation = modulation         # DVBViewer: 00 = Auto, 01 = QPSK, 10 = 8PSK, 11 = 16QAM
-        satModulation |= ( system & 1 ) << 2
+        satModulation = modulation  # DVBViewer: 00 = Auto, 01 = QPSK, 10 = 8PSK, 11 = 16QAM
+        satModulation |= (system & 1) << 2
         satModulation |= self.__rolloff(rolloff) << 3
         satModulation |= self.__pilot(pilot) << 7
 
@@ -110,26 +116,35 @@ class DvbViewer():
         self.Channels = []
         self.rootname = rootname
 
-    def addservice(self, service: lameDB.Service, name):
-        channel = Channel(service)
+    def addservice(self, service: lameDB.Service, kingofsat: Kingofsat.Service, name):
+        if kingofsat:
+            # For each audio id create new dvbViewer channel
+            for audio in kingofsat.APIDS:
+                self.__addchannel(service, kingofsat, name, audio)
+        else:
+            self.__addchannel(service, None, name, None)
+
+    def __addchannel(self, service: lameDB.Service, kof: Kingofsat.Service, name, kofAudioID):
+        channel = Channel(service, kof, kofAudioID)
         channel.Root = self.rootname
         channel.Category = name
         self.Channels.append(channel)
-        return
 
     def save(self, filename):
-        file = open( filename,  encoding='utf-8', mode="w")
+        file = open(filename, encoding='utf-8', mode="w")
 
-        keyMap = {"LNBSelection":"LNB-Selection"}
+        keyMap = {"LNBSelection": "LNB-Selection"}
 
         channelCount = 0
         for channel in self.Channels:
             file.write('[Channel{0}]\n'.format(channelCount))
-            for v,k in channel.__dict__.items():
+            for v, k in channel.__dict__.items():
+                if k is None:
+                    continue
                 if v in keyMap:
                     file.write('{0}={1}\n'.format(keyMap[v], k))
                 else:
-                    file.write('{0}={1}\n'.format(v,k))
+                    file.write('{0}={1}\n'.format(v, k))
             file.write('\n')
             channelCount = channelCount + 1
         file.close()
