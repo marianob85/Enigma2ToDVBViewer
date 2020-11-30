@@ -21,6 +21,7 @@ class Service():
 class Bouquet():
     def __init__(self):
         self.Name = None
+        self.FilePath = None
         self.Services = []
 
 class Bouquets():
@@ -37,7 +38,7 @@ class Bouquets():
                     FileName = os.path.dirname( FileName )
                     FileName = os.path.join( FileName, Bouquet.group(1) )
                     cBouquet = self.ReadBouquet( FileName )
-                    if cBouquet.Name == None:
+                    if cBouquet.Name == None or len( cBouquet.Services) == 0:
                         continue
                     
                     cBouquets.append( cBouquet )
@@ -47,16 +48,14 @@ class Bouquets():
     def ReadBouquet(self, FilePath):
         
         cBouquet = Bouquet()
-        
+        cBouquet.FilePath = FilePath
         with codecs.open( FilePath, 'r', encoding='utf-8', errors='ignore' ) as f:       
             for Line in f:
                 Name = re.match( '^#NAME (.+)$', Line )
                 if Name:
                    cBouquet.Name = Name.group( 1 ).strip()
-
                    continue
-                    
-                # Co oznacza 1:0:1 i dlaczego dla niektorych jest 19 ? Moze pilot...
+
                 serviceMath = re.match( '^#SERVICE 1:0:([\d\w]+):([\d\w\+]+):([\d\w]+):([\d\w]+):([\d\w]+):0:0:0:', Line )
                 if serviceMath:
                     service = Service()

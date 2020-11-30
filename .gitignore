@@ -1,3 +1,5 @@
 *.pyc
 .idea
 env
+/Pipfile
+/Pipfile.lock

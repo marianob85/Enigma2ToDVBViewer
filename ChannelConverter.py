@@ -53,8 +53,8 @@ if __name__ == '__main__':
         for bouquetService in bouquet.Services:
             service = cEnigma2Struct.FindService(bouquetService)
             if service is None:
-                print("Can't find serviceID: " + bouquetService.ServiceID)
-                exit(0)
+                print("Can't find serviceID: {} from bouquet Name: {} ({})".format(bouquetService.ServiceID, bouquet.Name, bouquet.FilePath ))
+                continue
 
             kosService = None
             if kingOfSatData:
