@@ -1,19 +1,26 @@
 import re
 import lameDBBouquet
+import os
+
 
 class TransponderS():
     def __init__(self):
         self.Frequency = 0x0  # In Hertz
         self.SymbolRateBPS = 0x0  # Symbol rate in bits per second.
-        self.Polarization = 0x0  # 0=Horizontal, 1=Vertical, 2=Circular Left, 3=Circular right.
+        # 0=Horizontal, 1=Vertical, 2=Circular Left, 3=Circular right.
+        self.Polarization = 0x0
         self.FEC = 0x0  # FEC_Auto=0, FEC_1_2=1, FEC_2_3=2, FEC_3_4=3, FEC_5_6=4, FEC_7_8=5, FEC_8_9=6, FEC_3_5=7, FEC_4_5=8, FEC_9_10=9, FEC_6_7=10, FEC_None=15
-        self.OrbitalPosition = 0x0  # in degrees East: 130 is 13.0E, 192 is 19.2E. Negative values are West -123 is 12.3West.
+        # in degrees East: 130 is 13.0E, 192 is 19.2E. Negative values are West -123 is 12.3West.
+        self.OrbitalPosition = 0x0
         self.Inversion = 0x0  # Inversion_Off, Inversion_On, Inversion_Unknown
-        self.Flags = 0x0  # Flags (Only in version 4): Field is absent in version 3.
+        # Flags (Only in version 4): Field is absent in version 3.
+        self.Flags = 0x0
         self.System = 0x0  # System_DVB_S, System_DVB_S2
         self.Modulation = 0x0  # 0 - Modulation_Auto, 1 - Modulation_QPSK, 2 - Modulation_8PSK, 3 - Modulation_QAM16, 4 - Modulation_16APSK, 5 - Modulation_32APSK
-        self.Rolloff = 0x0  # (Only used in DVB-S2): RollOff_alpha_0_35, RollOff_alpha_0_25, RollOff_alpha_0_20, RollOff_auto
-        self.Pilot = 0x0  # (Only used in DVB-S2): Pilot_Off, Pilot_On, Pilot_Unknown
+        # (Only used in DVB-S2): RollOff_alpha_0_35, RollOff_alpha_0_25, RollOff_alpha_0_20, RollOff_auto
+        self.Rolloff = 0x0
+        # (Only used in DVB-S2): Pilot_Off, Pilot_On, Pilot_Unknown
+        self.Pilot = 0x0
 
     def ReadData(self, Line):
         DataLine = Line.split(":")
@@ -36,12 +43,14 @@ class TransponderS():
         else:
             raise
 
+
 class Transponder():
     def __init__(self):
         self.DVBNameSpace = 0x0
         self.TransportStreamID = 0x0
         self.OriginalNetworkID = 0x0
-        self.Type = ''  # Satellite DVB ( s ), Terestrial DVB ( t ), Cable DVB ( c )
+        # Satellite DVB ( s ), Terestrial DVB ( t ), Cable DVB ( c )
+        self.Type = ''
         self.Data = None
 
     def ReadHeader(self, Line):
@@ -106,7 +115,7 @@ class Enigma2Struct():
         return list(data)
 
     def Open(self, Path):
-        self._file = open(Path, encoding='utf-8', mode="r")
+        self._file = open(Path, encoding='utf-8', mode="r", errors='ignore')
         self._read()
 
     def _read(self):
@@ -152,7 +161,8 @@ class Enigma2Struct():
                 break
 
             service = Service()
-            DVBNameSpace, TransportStreamID, OriginalNetworkID = service.ReadData(Line)
+            DVBNameSpace, TransportStreamID, OriginalNetworkID = service.ReadData(
+                Line)
 
             service.ReadChannelName(self._file.readline().strip())
             service.ReadProvider(self._file.readline().strip())
@@ -167,9 +177,8 @@ class Enigma2Struct():
             self.Services.append(service)
         return
 
-    def FindService(self, bouquet : lameDBBouquet.Service):
+    def FindService(self, bouquet: lameDBBouquet.Service):
         for service in self.Services:
             if service.ServiceID == bouquet.ServiceID and service.Transponder.DVBNameSpace == bouquet.DVBNameSpace and service.Transponder.TransportStreamID == bouquet.TransportStreamID and service.Transponder.OriginalNetworkID == bouquet.OriginalNetworkID:
                 return service
         return None
-
