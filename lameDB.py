@@ -70,6 +70,9 @@ class Service():
         self.Transponder = None
         self.ChannelName = None
         self.Provider = None
+        self.illegal_characters = "'"
+        self.illegal_characters_replace = "_"
+        self.trantab = str.maketrans(self.illegal_characters, self.illegal_characters_replace)
 
     def ReadData(self, Line):
         DataLine = Line.split(":")
@@ -84,7 +87,7 @@ class Service():
         return int(DataLine[1], 16), int(DataLine[2], 16), int(DataLine[3], 16)
 
     def ReadChannelName(self, Line):
-        self.ChannelName = Line.strip()
+        self.ChannelName = Line.strip().translate(self.trantab)
 
     def ReadProvider(self, Line):
         self.Provider = Line
@@ -164,7 +167,10 @@ class Enigma2Struct():
 
             if service.Transponder == None:
                 print("Can't find tranponder")
-            self.Services.append(service)
+            elif service.ChannelName == None or len( service.ChannelName ) < 2:
+                print("Incorrect service channel")
+            else:
+                self.Services.append(service)
         return
 
     def FindService(self, bouquet : lameDBBouquet.Service):
